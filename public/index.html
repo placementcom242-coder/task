@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AquaVenta - Complete Bottle Inventory, Vendor Billing & Real-time Sales Analytics System with Live API Explorer.">
+  <title>AquaVenta | Bottle Inventory & Vendor Sales Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M9.5 2a1.5 1.5 0 0 0-1.5 1.5V5H7a2 2 0 0 0-2 2v2.5a5.5 5.5 0 0 0 2.5 4.58V19a3 3 0 0 0 3 3h3a3 3 0 0 0 3-3v-4.92A5.5 5.5 0 0 0 19 9.5V7a2 2 0 0 0-2-2h-1V3.5A1.5 1.5 0 0 0 14.5 2h-5z'/></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar" id="mainNavbar">
+    <a href="#dashboard" class="nav-brand" id="brandLogoBtn">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      </div>
+      <span>AquaVenta</span>
+      <span class="brand-badge">PRO SUITE</span>
+    </a>
+
+    <ul class="nav-links" id="navLinksList">
+      <li>
+        <button class="nav-link-btn active" data-view="dashboard" id="navBtnDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard & Reports
+        </button>
+      </li>
+      <li>
+        <button class="nav-link-btn" data-view="bottles" id="navBtnBottles">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v3m4-3v3M7 7h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7z"/></svg>
+          Bottle Inventory
+        </button>
+      </li>
+      <li>
+        <button class="nav-link-btn" data-view="vendors" id="navBtnVendors">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Vendors & Billing
+        </button>
+      </li>
+      <li>
+        <button class="nav-link-btn" data-view="apiExplorer" id="navBtnApiExplorer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          API Explorer & Docs
+        </button>
+      </li>
+    </ul>
+
+    <div class="nav-actions">
+      <!-- Live API Console Button -->
+      <button class="api-logs-toggle-btn" id="toggleApiDrawerBtn" title="Toggle Live Network Logger">
+        <span class="status-dot"></span>
+        <span>API Activity (<span id="apiLogCountBadge">0</span>)</span>
+      </button>
+
+      <!-- Auth State Container -->
+      <div id="authNavContainer">
+        <!-- Will be populated dynamically by JS: either user profile pill or Login/Register buttons -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- ==================== VIEW 1: DASHBOARD & REPORTS ==================== -->
+    <section class="view-section active" id="view-dashboard">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h1>📊 Sales Analytics & Reports</h1>
+          <p>Real-time revenue, bottle sales distribution, and vendor transaction records.</p>
+        </div>
+
+        <div class="filter-bar">
+          <div class="period-pill-group" id="reportPeriodPills">
+            <button class="period-btn active" data-period="all" id="periodBtnAll">All Time</button>
+            <button class="period-btn" data-period="daily" id="periodBtnDaily">Daily</button>
+            <button class="period-btn" data-period="monthly" id="periodBtnMonthly">Monthly</button>
+            <button class="period-btn" data-period="yearly" id="periodBtnYearly">Yearly</button>
+          </div>
+
+          <!-- Dynamic Period Inputs -->
+          <div id="dynamicPeriodInputs" style="display: inline-flex; gap: 0.5rem;">
+            <input type="date" class="form-control" id="reportDateInput" style="display:none; width: auto; padding: 0.35rem 0.65rem;">
+            <select class="form-control" id="reportMonthSelect" style="display:none; width: auto; padding: 0.35rem 0.65rem;">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10" selected>October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+            <input type="number" class="form-control" id="reportYearInput" value="2026" min="2020" max="2030" style="display:none; width: 90px; padding: 0.35rem 0.65rem;">
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="refreshReportBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" style="--card-accent: #10b981;">
+          <div class="stat-header">
+            <span class="stat-label">Total Revenue</span>
+            <div class="stat-icon" style="color: #10b981;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="kpiTotalRevenue">₹0.00</div>
+          <div class="stat-subtext">Grand Total (Subtotal + GST)</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: #06b6d4;">
+          <div class="stat-header">
+            <span class="stat-label">Bottles Sold</span>
+            <div class="stat-icon" style="color: #06b6d4;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="kpiBottlesSold">0</div>
+          <div class="stat-subtext">Cumulative units dispatched</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: #6366f1;">
+          <div class="stat-header">
+            <span class="stat-label">SubTotal</span>
+            <div class="stat-icon" style="color: #6366f1;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="kpiSubTotal">₹0.00</div>
+          <div class="stat-subtext">Base amount before taxes</div>
+        </div>
+
+        <div class="stat-card" style="--card-accent: #f59e0b;">
+          <div class="stat-header">
+            <span class="stat-label">GST Tax Collected</span>
+            <div class="stat-icon" style="color: #f59e0b;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="kpiGstAmount">₹0.00</div>
+          <div class="stat-subtext">GST (18% default rate)</div>
+        </div>
+      </div>
+
+      <!-- Split Breakdown: Bottle-wise & Date-wise -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <!-- Bottle-wise sales distribution -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div class="card-box-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              Bottle Sales Breakdown
+            </div>
+            <span class="badge badge-bottle" id="bottleBreakdownCount">0 sizes</span>
+          </div>
+          <div class="card-box-body" id="bottleBreakdownContainer">
+            <div class="empty-state">No sales data available for this period.</div>
+          </div>
+        </div>
+
+        <!-- Date-wise breakdown -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div class="card-box-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Date-wise Activity
+            </div>
+            <span class="badge badge-success" id="dateBreakdownCount">0 dates</span>
+          </div>
+          <div class="card-box-body" id="dateBreakdownContainer">
+            <div class="empty-state">No daily activity recorded for this period.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendor Transactions Table in Report -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <div class="card-box-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Vendor Orders In Period
+          </div>
+          <div id="reportPaginationControls" style="display: flex; gap: 0.5rem; align-items: center;">
+            <button class="btn btn-secondary btn-sm" id="reportPrevPageBtn" disabled>&laquo; Prev</button>
+            <span style="font-size: 0.85rem; color: var(--text-muted);" id="reportPageIndicator">Page 1 / 1</span>
+            <button class="btn btn-secondary btn-sm" id="reportNextPageBtn" disabled>Next &raquo;</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="reportVendorsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Vendor Name</th>
+                <th>Bottles Ordered</th>
+                <th>Subtotal</th>
+                <th>GST Amount</th>
+                <th>Grand Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportVendorsTableBody">
+              <tr>
+                <td colspan="7" class="empty-state">Loading report data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: BOTTLES INVENTORY ==================== -->
+    <section class="view-section" id="view-bottles">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h1>🍾 Bottle Inventory Catalog</h1>
+          <p>Define bottle varieties, standard volumes (e.g., 200ML, 500ML, 1L, 5L), and unit pricing.</p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <input type="text" class="form-control" id="searchBottleInput" placeholder="Search bottle name or size..." style="width: 240px;">
+          <button class="btn btn-primary" id="openAddBottleModalBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New Bottle
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottles Cards Grid -->
+      <div class="bottles-grid" id="bottlesGridContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: VENDORS & BILLING ==================== -->
+    <section class="view-section" id="view-vendors">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h1>🏢 Vendor Accounts & Billing Orders</h1>
+          <p>Manage commercial vendors, assign bottle packages, and generate GST tax invoices.</p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <input type="text" class="form-control" id="searchVendorInput" placeholder="Search by name, GST or mobile..." style="width: 260px;">
+          <button class="btn btn-primary" id="openAddVendorModalBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Vendor / Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Vendors Table -->
+      <div class="card-box">
+        <div class="card-box-header">
+          <div class="card-box-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Registered Vendors Directory (<span id="totalVendorsBadge">0</span>)
+          </div>
+          <button class="btn btn-secondary btn-sm" id="refreshVendorsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="vendorsTable">
+            <thead>
+              <tr>
+                <th>Vendor Details</th>
+                <th>GSTIN & Contact</th>
+                <th>Address</th>
+                <th>Bottles Included</th>
+                <th>Subtotal</th>
+                <th>GST (18%)</th>
+                <th>Grand Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="vendorsTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: API EXPLORER & DOCS ==================== -->
+    <section class="view-section" id="view-apiExplorer">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h1>⚡ API Explorer & Interactive Showcase</h1>
+          <p>Explore, test, and view live JSON request/response payloads for every backend API endpoint.</p>
+        </div>
+
+        <div class="filter-bar">
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Filter Routes:</span>
+          <div class="period-pill-group" id="apiRouteFilterGroup">
+            <button class="period-btn active" data-filter="all">All (13)</button>
+            <button class="period-btn" data-filter="auth">Auth (2)</button>
+            <button class="period-btn" data-filter="bottle">Bottles (5)</button>
+            <button class="period-btn" data-filter="vendor">Vendors (5)</button>
+            <button class="period-btn" data-filter="report">Reports (1)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Endpoints Container -->
+      <div id="apiEndpointsShowcaseContainer">
+        <!-- Rendered dynamically by JS with complete request runners & live responses -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- AUTH MODAL (Login / Register) -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="authModalTitle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign In to AquaVenta
+        </div>
+        <button class="modal-close-btn" id="closeAuthModalBtn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab Switch -->
+        <div class="period-pill-group" style="margin-bottom: 1.5rem; width: 100%; display: grid; grid-template-columns: 1fr 1fr;">
+          <button class="period-btn active" id="tabAuthLogin" style="text-align: center;">Existing User (Login)</button>
+          <button class="period-btn" id="tabAuthSignup" style="text-align: center;">New User (Signup)</button>
+        </div>
+
+        <!-- Database Users Quick Fill Helper -->
+        <div style="background: rgba(99, 102, 241, 0.1); border: 1px dashed var(--border-highlight); padding: 0.75rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <div style="font-size: 0.75rem; color: var(--primary-light); font-weight: 700;">⚡ DATABASE USERS:</div>
+            <span style="font-size: 0.7rem; color: var(--text-dim);" id="dbUsersCountBadge">Live from MongoDB</span>
+          </div>
+          <div id="dbUsersChipContainer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <!-- Populated dynamically from MongoDB -->
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email Address</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="e.g. test@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitLoginBtn" style="width: 100%;">Sign In</button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="signupName">Full Name</label>
+            <input type="text" class="form-control" id="signupName" placeholder="e.g. Robert Smith" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signupEmail">Email</label>
+              <input type="email" class="form-control" id="signupEmail" placeholder="name@domain.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signupMobile">Mobile Number</label>
+              <input type="tel" class="form-control" id="signupMobile" placeholder="10-digit number" pattern="[0-9]{10}" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="signupPassword">Password</label>
+              <input type="password" class="form-control" id="signupPassword" placeholder="Min 6 characters" minlength="6" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="signupConfirmPassword">Confirm Password</label>
+              <input type="password" class="form-control" id="signupConfirmPassword" placeholder="Repeat password" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitSignupBtn" style="width: 100%;">Register Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT BOTTLE MODAL -->
+  <div class="modal-backdrop" id="bottleModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="bottleModalTitle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v3m4-3v3M7 7h10v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7z"/></svg>
+          Add New Bottle
+        </div>
+        <button class="modal-close-btn" id="closeBottleModalBtn">&times;</button>
+      </div>
+      <form id="bottleForm">
+        <div class="modal-body">
+          <input type="hidden" id="bottleFormId">
+
+          <div class="form-group">
+            <label class="form-label" for="bottleNameInput">Bottle Name</label>
+            <input type="text" class="form-control" id="bottleNameInput" placeholder="e.g. Mineral Water Bottle, Premium Water Jug" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bottleSizeInput">Bottle Size / Volume</label>
+            <input type="text" class="form-control" id="bottleSizeInput" placeholder="e.g. 200ML, 500ML, 1L, 5L, 20L" required>
+            <div style="display: flex; gap: 0.35rem; margin-top: 0.5rem; flex-wrap: wrap;">
+              <span style="font-size: 0.75rem; color: var(--text-dim); margin-right: 0.25rem;">Quick sizes:</span>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="200ML">200ML</button>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="500ML">500ML</button>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="1L">1L</button>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="2L">2L</button>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="5L">5L</button>
+              <button type="button" class="btn btn-secondary btn-sm size-chip-btn" data-size="20L">20L</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bottlePriceInput">Unit Price (₹ INR)</label>
+            <input type="number" step="0.01" min="0" class="form-control" id="bottlePriceInput" placeholder="e.g. 50" required>
+          </div>
+
+          <!-- Live Bottle Preview -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; margin-top: 1rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Preview</div>
+              <div style="font-weight: 700; color: #fff;" id="previewBottleName">Sample Bottle</div>
+              <span class="bottle-size-tag" id="previewBottleSize" style="margin-top: 0.25rem; display: inline-block;">1L</span>
+            </div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald);" id="previewBottlePrice">₹0.00</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelBottleModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBottleSubmitBtn">Save Bottle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT VENDOR MODAL -->
+  <div class="modal-backdrop" id="vendorModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title" id="vendorModalTitle">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Create Vendor & Order
+        </div>
+        <button class="modal-close-btn" id="closeVendorModalBtn">&times;</button>
+      </div>
+      <form id="vendorForm">
+        <div class="modal-body">
+          <input type="hidden" id="vendorFormId">
+
+          <!-- Section 1: Vendor Details -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-light); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>1. Commercial & Contact Information</span>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="vendorNameInput">Vendor / Company Name</label>
+                <input type="text" class="form-control" id="vendorNameInput" placeholder="e.g. Shree General Store" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="vendorGstInput">GSTIN / Tax Number</label>
+                <input type="text" class="form-control" id="vendorGstInput" placeholder="e.g. 24ABCDE1234F1Z5" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="vendorEmailInput">Business Email</label>
+                <input type="email" class="form-control" id="vendorEmailInput" placeholder="e.g. store@vendor.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="vendorMobileInput">Mobile Number</label>
+                <input type="tel" class="form-control" id="vendorMobileInput" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vendorAddressInput">Complete Billing & Delivery Address</label>
+              <textarea class="form-control" id="vendorAddressInput" rows="2" placeholder="e.g. Shop 12, Ring Road Commercial Complex, Surat" required></textarea>
+            </div>
+          </div>
+
+          <!-- Section 2: Bottle Package Line Items -->
+          <div style="margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <div style="font-size: 0.95rem; font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.4rem;">
+                <span>2. Bottle Line Items & Quantities</span>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" id="addBottleRowBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                + Add Bottle Row
+              </button>
+            </div>
+
+            <div class="line-items-container">
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 0.75rem; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem; padding-bottom: 0.25rem;">
+                <span>Select Bottle Variety</span>
+                <span>Unit Price (₹)</span>
+                <span>Quantity</span>
+                <span>Action</span>
+              </div>
+              <div id="vendorBottleRowsContainer">
+                <!-- Rows injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Tax & Live Cost Summary -->
+          <div class="order-calculation-card">
+            <div class="form-row" style="align-items: center; margin-bottom: 1rem;">
+              <div>
+                <label class="form-label" for="vendorGstPercentInput">GST Percentage Applied (%)</label>
+                <input type="number" class="form-control" id="vendorGstPercentInput" value="18" min="0" max="100" style="width: 140px;">
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">
+                * Standard GST rate is 18%. Price, Subtotal, and Grand Total are verified and calculated automatically.
+              </div>
+            </div>
+
+            <div class="calc-row">
+              <span>Item Subtotal:</span>
+              <strong id="calcSubTotal">₹0.00</strong>
+            </div>
+            <div class="calc-row">
+              <span>GST Tax (<span id="calcGstRate">18</span>%):</span>
+              <strong id="calcGstAmount">₹0.00</strong>
+            </div>
+            <div class="calc-row grand-total">
+              <span>Grand Total Payable:</span>
+              <span id="calcGrandTotal" style="color: var(--accent-emerald);">₹0.00</span>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelVendorModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveVendorSubmitBtn">Save Vendor & Bill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRINTABLE INVOICE MODAL -->
+  <div class="modal-backdrop" id="invoiceModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Tax Invoice Preview
+        </div>
+        <div>
+          <button class="btn btn-secondary btn-sm" id="printInvoiceBtn" style="margin-right: 0.5rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print Invoice
+          </button>
+          <button class="modal-close-btn" id="closeInvoiceModalBtn">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" style="background: #f8fafc; padding: 2rem;">
+        <div class="invoice-sheet" id="invoiceSheetContent">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM DELETE MODAL -->
+  <div class="modal-backdrop" id="confirmDeleteModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title" style="color: var(--accent-rose);">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Confirm Deletion
+        </div>
+        <button class="modal-close-btn" id="closeConfirmDeleteModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmDeleteMessage">Are you sure you want to delete this record? This action cannot be reversed.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteSubmitBtn">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE API ACTIVITY DRAWER (Floating Console) -->
+  <div class="api-drawer" id="apiActivityDrawer">
+    <div class="api-drawer-header" id="apiDrawerHeader">
+      <div class="drawer-title">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Live API Network Stream
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn btn-secondary btn-sm" id="clearApiLogsBtn" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Clear</button>
+        <button class="modal-close-btn" id="minimizeDrawerBtn" style="font-size: 1.1rem; line-height: 1;">&#9660;</button>
+      </div>
+    </div>
+    <div class="api-drawer-body" id="apiDrawerBody">
+      <div style="color: var(--text-dim); text-align: center; padding: 2rem;">No network activity yet. Make an API request to see real-time logs here.</div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
